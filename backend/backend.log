@@ -1,0 +1,48 @@
+
+> projects@1.0.0 dev
+> npm run build && npm run start
+
+
+> projects@1.0.0 build
+> npx tsc -b
+
+
+> projects@1.0.0 start
+> node dist/index.js
+
+[dotenv@17.1.0] injecting env (1) from .env (tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' })
+MongoDB connection error: MongooseServerSelectionError: connect ECONNREFUSED 127.0.0.1:27017
+    at _handleConnectionErrors (/app/code/brain-app/backend/node_modules/mongoose/lib/connection.js:1165:11)
+    at NativeConnection.openUri (/app/code/brain-app/backend/node_modules/mongoose/lib/connection.js:1096:11)
+    at async connectDB (file:///app/code/brain-app/backend/dist/config/db.js:5:9) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'Unknown',
+    servers: Map(1) { 'localhost:27017' => [ServerDescription] },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: null,
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  cause: TopologyDescription {
+    type: 'Unknown',
+    servers: Map(1) { 'localhost:27017' => [ServerDescription] },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: null,
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  }
+}
+Continuing without database connection for development...
+Server running on http://localhost:8000
