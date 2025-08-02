@@ -4,6 +4,7 @@ import Layout from "./components/layout/Layout";
 import Dashboard from "./pages/Dashboard";
 import AuthForm from "./components/auth/AuthForm";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { BrowserRouter, Routes } from "react-router-dom";
 
 function AppContent() {
   const { user, loading } = useAuth();
@@ -36,8 +37,13 @@ function AppContent() {
 export default function App() {
   return (
     <AuthProvider>
+    <BrowserRouter>
+      <Routes>
+        <Route path=""/>
+      </Routes>
       <AppContent />
-      <Toaster position="top-right" />
+      <Toaster position="bottom-right" />
+    </BrowserRouter>
     </AuthProvider>
   );
 }

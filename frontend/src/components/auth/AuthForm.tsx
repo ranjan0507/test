@@ -9,28 +9,29 @@ interface AuthFormProps {
   onToggleMode: () => void;
 }
 
-export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
+export default async function AuthForm({ mode, onToggleMode }: AuthFormProps) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState("");
   const { login, register, loading } = useAuth();
+
+  try {
+    if (mode === 'login') {
+      await login(username, password);
+    } else {
+      await register(username, password);
+    }
+  } catch (err: any) {
+    setError(err?.message || "Something went wrong");
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!username || !password) {
       return;
     }
-
-    try {
-      if (mode === 'login') {
-        await login(username, password);
-      } else {
-        await register(username, password);
-      }
-    } catch (error) {
-      // Error is handled in the auth context
-    }
-  };
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4">
@@ -53,7 +54,7 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
               required
             />
           </div>
-          
+
           <div>
             <Input
               type="password"
@@ -86,6 +87,9 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
           </p>
         </div>
       </Card>
+      {error && (
+        <div className="text-red-400 text-sm text-center">{error}</div>
+      )}
     </div>
   );
 }

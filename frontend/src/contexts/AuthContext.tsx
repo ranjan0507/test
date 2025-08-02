@@ -28,7 +28,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for existing token on app start
     const savedToken = localStorage.getItem('token');
     const savedUser = localStorage.getItem('user');
     
