@@ -11,7 +11,7 @@ import { redirectByHash } from "./controllers/link.controller.js";
 const app = express();
 
 app.use(cors({
-  origin: "http://localhost:5174",
+  origin: "http://localhost:5173",
   credentials: true
 }));
 
@@ -36,7 +36,6 @@ console.log("Environment:", {
   PORT: PORT
 });
 
-// Try to connect to database but start server regardless
 connectDB().finally(() => {
   app.listen(PORT, () => {
     console.log(`✓ Server running on http://localhost:${PORT}`);

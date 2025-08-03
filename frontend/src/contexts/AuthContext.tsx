@@ -1,105 +1,71 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { authApi } from '../services/api';
-import type { User } from '../types';
-import toast from 'react-hot-toast';
+import { authApi } from "@/services/api";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import type { AuthResponse } from "../types/index.ts";
 
-interface AuthContextType {
-  user: User | null;
-  token: string | null;
-  login: (username: string, password: string) => Promise<void>;
-  register: (username: string, password: string) => Promise<void>;
-  logout: () => void;
-  loading: boolean;
+interface AuthContextType{
+  user : AuthResponse["user"] | null ;
+  loading : boolean ;
+  login : (username:string , password : string) => Promise<void> ;
+  register : (username:string , password : string) => Promise<void> ;
+  logout : () => void ;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType|undefined>(undefined)
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export function AuthProvider({children} : {children : ReactNode}){
+  const [user,setUser] = useState<AuthContextType["user"]>(null) ;
+  const [loading,setLoading] = useState(true) ;
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const savedToken = localStorage.getItem('token');
-    const savedUser = localStorage.getItem('user');
-    
-    if (savedToken && savedUser) {
-      setToken(savedToken);
-      setUser(JSON.parse(savedUser));
+  useEffect(()=>{
+    const token = localStorage.getItem('token') ;
+    const stored = localStorage.getItem('user') ;
+    if(token && stored){
+      setUser(JSON.parse(stored))
     }
-    setLoading(false);
-  }, []);
+    setLoading(false)
+  },[])
 
   const login = async (username: string, password: string) => {
     try {
-      setLoading(true);
-      const response = await authApi.login(username, password);
-      
-      setUser(response.user);
-      setToken(response.token);
-      
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
-      
-      toast.success('Logged in successfully!');
-    } catch (error: any) {
-      console.error('Login error:', error);
-      toast.error(error.response?.data?.message || 'Login failed');
-      throw error;
-    } finally {
-      setLoading(false);
+      const res = await authApi.login(username, password);
+      localStorage.setItem('token', res.token);
+      localStorage.setItem('user', JSON.stringify(res.user));
+      setUser(res.user);
+    } catch (err: any) {
+      throw new Error(err.message || 'Login failed');
     }
-  };
+  }
 
   const register = async (username: string, password: string) => {
     try {
-      setLoading(true);
-      const response = await authApi.register(username, password);
-      
-      setUser(response.user);
-      setToken(response.token);
-      
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
-      
-      toast.success('Account created successfully!');
-    } catch (error: any) {
-      console.error('Registration error:', error);
-      toast.error(error.response?.data?.message || 'Registration failed');
-      throw error;
-    } finally {
-      setLoading(false);
+      const res = await authApi.register(username, password);
+      localStorage.setItem('token', res.token);
+      localStorage.setItem('user', JSON.stringify(res.user));
+      setUser(res.user);
+    } catch (err: any) {
+      throw new Error(err.message || 'Registration failed');
     }
-  };
+  }
 
   const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setUser(null);
-    setToken(null);
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    toast.success('Logged out successfully!');
   };
 
-  const value = {
-    user,
-    token,
-    login,
-    register,
-    logout,
-    loading,
-  };
-
-  return (
-    <AuthContext.Provider value={value}>
+  return(
+    <AuthContext.Provider
+    value={{loading,login,register,logout,user}}
+    >
       {children}
     </AuthContext.Provider>
-  );
-};
+  )
+}
+
+export function useAuth() {
+  const ctx = useContext(AuthContext);
+  if (!ctx) {
+    throw new Error("useAuth must be used within AuthProvider");
+  }
+  return ctx;
+}

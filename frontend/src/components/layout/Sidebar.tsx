@@ -1,24 +1,19 @@
 import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
-  Search,
   User,
   Plus,
-  Heart,
   Settings,
   LogOut
 } from "lucide-react";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext.tsx";
 
 const navItems = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-  { to: "/search", icon: Search, label: "Search" },
   { to: "/my", icon: User, label: "My" },
-  { to: "/create", icon: Plus, label: "New Item" },
-  { to: "/favorites", icon: Heart, label: "Favorites" },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ onCategoryClick, onNewItemClick }: { onCategoryClick?: () => void, onNewItemClick?: () => void }) {
   const { logout, user } = useAuth();
 
   return (
@@ -43,6 +38,18 @@ export default function Sidebar() {
             <span className="font-medium">{label}</span>
           </NavLink>
         ))}
+        <button
+          onClick={onNewItemClick}
+          className="flex items-center space-x-3 w-full px-3 py-2 rounded-lg transition-colors text-gray-400 hover:text-white hover:bg-white/5"
+        >
+          <span className="inline-flex items-center"><Plus className="w-5 h-5 mr-2" />New Item</span>
+        </button>
+        <button
+          onClick={onCategoryClick}
+          className="flex items-center space-x-3 w-full px-3 py-2 rounded-lg transition-colors text-gray-400 hover:text-white hover:bg-white/5"
+        >
+          <span className="inline-flex items-center"><Plus className="w-5 h-5 mr-2" />Categories</span>
+        </button>
       </nav>
 
       <div className="p-4 space-y-2 border-t border-gray-700">

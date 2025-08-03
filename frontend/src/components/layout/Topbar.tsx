@@ -1,4 +1,4 @@
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/input.tsx";
 import { SearchIcon, Bell, Settings, User } from "lucide-react";
 
 export default function Topbar() {

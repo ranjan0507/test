@@ -38,3 +38,9 @@ export interface Link {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface LinkType {
+  _id: string;
+  originalUrl: string;
+  hash: string;
+}
