@@ -1,6 +1,6 @@
 import React from "react";
-import Sidebar from "./Sidebar.tsx";
-import Topbar from "./Topbar.tsx";
+import Sidebar from "./Sidebar";
+import Header from "./Header";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -8,11 +8,13 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   return (
-    <div className="min-h-screen flex bg-gray-900">
+    <div className="min-h-screen bg-gray-50 flex">
       <Sidebar />
       <div className="flex-1 flex flex-col">
-        <Topbar />
-        <main className="p-6 overflow-y-auto bg-gray-900">{children}</main>
+        <Header />
+        <main className="flex-1 p-6 overflow-y-auto">
+          {children}
+        </main>
       </div>
     </div>
   );

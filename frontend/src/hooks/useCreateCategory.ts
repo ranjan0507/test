@@ -7,7 +7,10 @@ export function useCreateCategory() {
   const qc = useQueryClient();
 
   return useMutation<Category, Error, string>({
-    mutationFn: (name: string) => categoriesApi.create(name),
+    mutationFn: async (name: string) => {
+      const response = await categoriesApi.create(name);
+      return response.category || response;
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["categories"] });
     },

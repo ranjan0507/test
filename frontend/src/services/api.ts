@@ -1,8 +1,8 @@
 import axios , {type AxiosInstance } from "axios"
 import type { Category, Content, LinkType, AuthResponse } from "../types";
 
-const api : AxiosInstance = axios.create({
-  baseURL : "http://localhost:3000/api" ,
+const api: AxiosInstance = axios.create({
+  baseURL: "http://localhost:8000/api",
   headers : {
     "Content-Type":"application/json"
   }
@@ -39,16 +39,5 @@ export const contentApi = {
   update : (contentId : string , data : Partial<Content>) => api.patch<Content>(`/content/${contentId}`,data).then(res => res.data) ,
   delete : (contentId : string) => api.delete<void>(`/content/${contentId}`).then(res => res.data)
 }
-
-export const linksApi = {
-  getAll: () =>
-    api.get<LinkType[]>("/links").then(res => res.data),
-
-  create: (originalUrl: string) =>
-    api.post<LinkType>("/links", { originalUrl }).then(res => res.data),
-
-  delete: (linkId: string) =>
-    api.delete<void>(`/links/${linkId}`).then(res => res.data),
-};
 
 export default api ;

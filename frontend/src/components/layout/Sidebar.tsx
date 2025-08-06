@@ -1,78 +1,107 @@
 import { NavLink } from "react-router-dom";
-import {
-  LayoutDashboard,
-  User,
-  Plus,
-  Settings,
-  LogOut
-} from "lucide-react";
-import { useAuth } from "../../contexts/AuthContext.tsx";
+import { LayoutDashboard, Folder, Plus, Brain } from "lucide-react";
+import { useState } from "react";
+import CreateContentModal from "@/components/modals/CreateContentModal";
+import { useCategories } from "@/hooks/useCategories";
+import { useCreateContent } from "@/hooks/useCreateContent";
+import toast from "react-hot-toast";
 
 const navItems = [
-  { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-  { to: "/my", icon: User, label: "My" },
+  { to: "/", icon: LayoutDashboard, label: "Dashboard" },
+  { to: "/categories", icon: Folder, label: "Categories" },
 ];
 
-export default function Sidebar({ onCategoryClick, onNewItemClick }: { onCategoryClick?: () => void, onNewItemClick?: () => void }) {
-  const { logout, user } = useAuth();
+export default function Sidebar() {
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const { data: categories = [] } = useCategories();
+  const createContent = useCreateContent();
+
+  const handleCreateContent = (data: any) => {
+    const payload = {
+      title: data.title,
+      content: data.content || data.description,
+      type: data.type,
+      categoryId: data.categoryId,
+      tags: data.tags || []
+    };
+
+    createContent.mutate(payload, {
+      onSuccess: () => {
+        toast.success("Content created successfully!");
+        setShowCreateModal(false);
+      },
+      onError: (error: any) => {
+        toast.error(error.message || "Failed to create content");
+      },
+    });
+  };
 
   return (
-    <div className="w-64 bg-gray-900 text-white flex flex-col">
-      <div className="p-6">
-        <h1 className="text-2xl font-bold">Brain</h1>
-        {user && <p className="text-sm text-gray-400 mt-1">Welcome, {user.username}</p>}
-      </div>
+    <>
+      <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
+        {/* Logo */}
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
+              <Brain className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-xl font-bold text-gray-900">Brain</span>
+          </div>
+        </div>
 
-      <nav className="flex-1 px-4 space-y-2">
-        {navItems.map(({ to, icon: Icon, label }) => (
-          <NavLink
-            key={to}
-            to={to}
-            className={({ isActive }) =>
-              `flex items-center space-x-3 w-full px-3 py-2 rounded-lg transition-colors ${
-                isActive ? "bg-white/10 text-white" : "text-gray-400 hover:text-white hover:bg-white/5"
-              }`
-            }
+        {/* Navigation */}
+        <nav className="flex-1 p-4 space-y-2">
+          {navItems.map(({ to, icon: Icon, label }) => (
+            <NavLink
+              key={to}
+              to={to}
+              className={({ isActive }) =>
+                `flex items-center space-x-3 w-full px-3 py-2 rounded-lg transition-colors ${
+                  isActive 
+                    ? "bg-blue-50 text-blue-700 border border-blue-200" 
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                }`
+              }
+            >
+              <Icon className="w-5 h-5" />
+              <span className="font-medium">{label}</span>
+            </NavLink>
+          ))}
+          
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="flex items-center space-x-3 w-full px-3 py-2 rounded-lg transition-colors text-gray-600 hover:text-gray-900 hover:bg-gray-50 mt-4"
           >
-            <Icon className="w-5 h-5" />
-            <span className="font-medium">{label}</span>
-          </NavLink>
-        ))}
-        <button
-          onClick={onNewItemClick}
-          className="flex items-center space-x-3 w-full px-3 py-2 rounded-lg transition-colors text-gray-400 hover:text-white hover:bg-white/5"
-        >
-          <span className="inline-flex items-center"><Plus className="w-5 h-5 mr-2" />New Item</span>
-        </button>
-        <button
-          onClick={onCategoryClick}
-          className="flex items-center space-x-3 w-full px-3 py-2 rounded-lg transition-colors text-gray-400 hover:text-white hover:bg-white/5"
-        >
-          <span className="inline-flex items-center"><Plus className="w-5 h-5 mr-2" />Categories</span>
-        </button>
-      </nav>
+            <Plus className="w-5 h-5" />
+            <span className="font-medium">Add Content</span>
+          </button>
+        </nav>
 
-      <div className="p-4 space-y-2 border-t border-gray-700">
-        <NavLink
-          to="/settings"
-          className={({ isActive }) =>
-            `flex items-center space-x-3 w-full px-3 py-2 rounded-lg transition-colors ${
-              isActive ? "bg-white/10 text-white" : "text-gray-400 hover:text-white hover:bg-white/5"
-            }`
-          }
-        >
-          <Settings className="w-5 h-5" />
-          <span className="font-medium">Settings</span>
-        </NavLink>
-
-        <button
-          onClick={logout}
-          className="flex items-center space-x-3 w-full px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5"
-        >
-          <LogOut className="w-5 h-5" />
-          <span className="font-medium">Log out</span>
-        </button>
+        {/* Quick Categories */}
+        <div className="p-4 border-t border-gray-200">
+          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+            Quick Access
+          </h3>
+          <div className="space-y-1">
+            {categories.slice(0, 5).map((category) => (
+              <div
+                key={category._id}
+                className="flex items-center space-x-2 px-2 py-1 text-sm text-gray-600 hover:text-gray-900 cursor-pointer"
+              >
+                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                <span className="truncate">{category.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-    </div>
+
+      <CreateContentModal
+        open={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onSubmit={handleCreateContent}
+        categories={categories}
+      />
+    </>
   );
 }

@@ -5,7 +5,10 @@ import type { Content } from "../types/index.ts";
 export function useCreateContent() {
   const qc = useQueryClient();
   return useMutation<Content, Error, Partial<Content>>({
-    mutationFn: (data: Partial<Content>) => contentApi.create(data),
+    mutationFn: async (data: Partial<Content>) => {
+      const response = await contentApi.create(data);
+      return response.content || response;
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["content"] });
     },
@@ -15,7 +18,10 @@ export function useCreateContent() {
 export function useEditContent() {
   const qc = useQueryClient();
   return useMutation<Content, Error, { _id: string; data: Partial<Content> }>({
-    mutationFn: ({ _id, data }) => contentApi.update(_id, data),
+    mutationFn: async ({ _id, data }) => {
+      const response = await contentApi.update(_id, data);
+      return response.content || response;
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["content"] });
     },
